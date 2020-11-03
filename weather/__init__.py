@@ -1,4 +1,4 @@
-from .gmubot import GMUBot
+from .weather import Weather
 
 
 def setup(bot):
