@@ -56,8 +56,8 @@ def checkRanges(ts: List[datetime]) -> List[List[datetime]]:
     ps = [[]]
 
     for t in ts:
-        #if not ps[pointer]:
-            #break
+        if not ps[pointer]:
+            ps.append([])
         if (t-c).total_seconds() == 3600:
             ps[pointer].append(t)
         else:
