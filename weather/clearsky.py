@@ -1,3 +1,5 @@
+import asyncio
+
 import requests
 from bs4 import BeautifulSoup
 from io import BytesIO
@@ -7,7 +9,7 @@ center = r"http://www.cleardarksky.com/c/CntrvllVAkey.html"
 base = r"http://www.cleardarksky.com"
 
 
-def getWeatherImage(url: str):
+async def getWeatherImage(url: str):
     # prep image retrieval
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -19,3 +21,6 @@ def getWeatherImage(url: str):
 
     return BytesIO(r.content)
 
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(getWeatherImage("http://www.cleardarksky.com/c/GMUObVAcsk.gif"))
+# loop.close()
