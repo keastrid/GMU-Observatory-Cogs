@@ -41,7 +41,7 @@ def parseSiteData(data: str):
         msg = "Observing is a GO! Found the following acceptable time range(s) (24Hr time):\n" \
               + msg.replace(") (", "), (")
     else:
-        msg = "Observing is a NO GO! No 3 hours time window could be composed!"
+        msg = "Observing is a NO GO! No 3 hour time window could be composed!"
     return msg
 
 
