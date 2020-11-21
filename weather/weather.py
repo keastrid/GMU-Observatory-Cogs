@@ -25,4 +25,8 @@ class Weather(commands.Cog):
             s3 = txtparser.message()
             msg = "GMU Observatory: {}".format(s3)
 
-            await ctx.send(msg, file=sendF3)
+            if f3.__sizeof__() < 1000:
+                await ctx.send(msg + "\nImage Failed to Download, attempting embed...\n" +
+                               r"http://www.cleardarksky.com/c/GMUObVAcsk.gif")
+            else:
+                await ctx.send(msg, file=sendF3)
