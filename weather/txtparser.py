@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 import pytz
 from typing import List
 
+from tribool import Tribool
+
 url = r"https://www.cleardarksky.com/txtc/GMUObVAcsp.txt"
 tz = pytz.timezone("US/Eastern")
 today = datetime.now(tz).replace(hour=10, minute=0)
@@ -17,6 +19,14 @@ def getSiteData(url2: str):
 
 
 def parseSiteData(data: str):
+    msg = ""
+
+    valid, emsg = verifyData(data)
+    if (valid == Tribool(None)).value:
+        msg += emsg
+    if (valid == Tribool(False)).value:
+        return emsg
+
     blocks = re.findall(r"(\"[0-9-\s:]+\",[\s0-9]+,[\s0-9]+,[\s0-9]+,[(\s0-9)|None]+,[\s0-9]+,[\s0-9]+,[\s0-9]+)", data,
                         re.MULTILINE)
     dBlocks = re.findall(r'("[0-9-\s:]+",[\s0-9.-]+,[\s0-9.-]+,[\s0-9.-]+\))', data,
@@ -29,10 +39,9 @@ def parseSiteData(data: str):
         dBlockData.append(parseDarknessBlocks(dBlock))
     relevantData = [d for d in mergeListMaps(blockData, dBlockData) if today < d["date"] < tomorrow]
     goodTimes = [d["date"] for d in filterTonight(relevantData)]
-    print(goodTimes)
+    #print(goodTimes)
     ranges = checkRanges(goodTimes)
-    print(ranges)
-    msg = ""
+    #print(ranges)
     for r in ranges:
         if r:
             (start, end) = r
@@ -43,6 +52,29 @@ def parseSiteData(data: str):
     else:
         msg = "Observing is a NO GO! No 3 hour time window could be composed!"
     return msg
+
+
+# Verify that site data was correctly pulled
+def verifyData(data: str):
+    msg = ""
+    valid = Tribool(True)
+
+    # Extract Version
+    version = ""
+    if versionFinder := re.search(r'version\s+=\s+"(.+)"', data, re.IGNORECASE):
+        version = versionFinder.group(1)
+    expectedVersion = 'ah03'  # Version of the data that the parser is keyed for
+
+    if version != expectedVersion and version != "":
+        valid = Tribool(None)
+        msg += "Version of ClearDarkSky data is different from expected! Attempting to parse anyway...\n" \
+               "Expected version: {} but got: {}!\n".format(expectedVersion, version)
+    if version == "":
+        valid = Tribool(False)
+        msg += "Could not determine the version of ClearDarkSky, assuming that data was unable to be pulled and " \
+               "stopping further processing!\n"
+
+    return valid, msg
 
 
 # Get all contiguous time ranges that are no less than 3 hours long
