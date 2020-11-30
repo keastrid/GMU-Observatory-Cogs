@@ -9,15 +9,15 @@ center = r"http://www.cleardarksky.com/c/CntrvllVAkey.html"
 base = r"http://www.cleardarksky.com"
 
 
-async def getWeatherImage(url: str):
+async def getWeatherImage(s: requests.sessions, url: str):
     # prep image retrieval
-    page = requests.get(url)
+    page = s.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
     imgTag = soup.find(id='csk_image')
     imgUrl = r"http://www.cleardarksky.com/c/GMUObVAcsk.gif"#base + imgTag.get('src')
 
     # pull image
-    r = requests.get(imgUrl, stream=True)
+    r = s.get(imgUrl, stream=True)
 
     return BytesIO(r.content)
 

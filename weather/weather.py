@@ -1,4 +1,5 @@
 import asyncio
+import requests
 
 from discord import File
 from redbot.core import commands
@@ -18,14 +19,16 @@ class Weather(commands.Cog):
     @commands.command()
     async def weather(self, ctx):
         async with ctx.channel.typing():
+            s = requests.Session()
+
             # images
-            f3 = await clearsky.getWeatherImage(r"http://www.cleardarksky.com/c/GMUObVAkey.html")
+            f3 = await clearsky.getWeatherImage(s, r"http://www.cleardarksky.com/c/GMUObVAkey.html")
             await asyncio.sleep(2)
             sendF3 = File(f3, filename='gmu.png')
             # await ctx.send()
 
             # (no) go status
-            s3 = txtparser.message()
+            s3 = txtparser.message(s)
             msg = "GMU Observatory: {}".format(s3)
 
             if f3.__sizeof__() < 2000:

@@ -13,8 +13,8 @@ tomorrow = today + timedelta(days=1)
 
 
 # pull the site's text
-def getSiteData(url2: str):
-    page = requests.get(url2)
+def getSiteData(ses: requests.sessions, url2: str):
+    page = ses.get(url2)
     return page.text
 
 
@@ -143,7 +143,7 @@ def parseDarknessBlocks(dBlock: str):
     return data
 
 
-def message():
+def message(s: requests.sessions):
     global url
     global tz
     global today
@@ -152,7 +152,8 @@ def message():
     tz = pytz.timezone("US/Eastern")
     today = datetime.now(tz).replace(hour=10, minute=0)
     tomorrow = today + timedelta(days=1)
-    data = getSiteData(url)
+    data = getSiteData(s, url)
     return parseSiteData(data)
 
-print(message())
+
+#print(message(requests.Session()))
