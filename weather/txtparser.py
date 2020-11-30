@@ -1,3 +1,5 @@
+import time
+
 import requests
 import re
 from datetime import datetime, timedelta
@@ -14,7 +16,14 @@ tomorrow = today + timedelta(days=1)
 
 # pull the site's text
 def getSiteData(ses: requests.sessions, url2: str):
-    page = ses.get(url2)
+    maxTries = 3
+    counter = 0
+
+    # Try a few times if no data was given
+    while (page := ses.get(url2)).status_code != 200 and counter < maxTries:
+        time.sleep(1)
+        counter += 1
+
     return page.text
 
 
