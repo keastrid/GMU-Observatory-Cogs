@@ -7,14 +7,27 @@ from . import clearsky, txtparser
 
 
 class Weather(commands.Cog):
-    """My custom cog"""
+    """Weather cog for pulling data from ClearDarkSky"""
 
-    # @commands.command()
-    # async def weather2(self, ctx):
-    #     """This does stuff!"""
-    #     # Your code will go here
-    #     a = await source.getWeather()
-    #     await ctx.send(a)
+    @commands.command()
+    async def weatherimage(self, ctx):
+        async with ctx.channel.typing():
+            s = requests.Session()
+
+            # images
+            hasImg, img, imgURL = await clearsky.getWeatherImage(s, r"http://www.cleardarksky.com/c/GMUObVAkey.html")
+            await asyncio.sleep(2)
+            # await ctx.send()
+
+            # (no) go status
+            s3 = txtparser.message(s)
+            msg = "GMU Observatory: {}".format(s3)
+
+            if not hasImg:
+                await ctx.send("Failed to download image. Please try again later.")
+            else:
+                sendF3 = File(img, filename='forecast.png')
+                await ctx.send(msg, file=sendF3)
 
     @commands.command()
     async def weather(self, ctx):
@@ -22,18 +35,18 @@ class Weather(commands.Cog):
             s = requests.Session()
 
             # images
-            f3 = await clearsky.getWeatherImage(s, r"http://www.cleardarksky.com/c/GMUObVAkey.html")
+            hasImg, img, imgURL = await clearsky.getWeatherImage(s, r"http://www.cleardarksky.com/c/GMUObVAkey.html")
             await asyncio.sleep(2)
-            sendF3 = File(f3, filename='gmu.png')
             # await ctx.send()
 
             # (no) go status
             s3 = txtparser.message(s)
             msg = "GMU Observatory: {}".format(s3)
 
-            if f3.__sizeof__() < 2000:
+            if not hasImg:
                 await ctx.send(msg + "\nImage failed to download, defaulting to embed...\n"
                                      "The embed seen may not reflect the image at the time of this command.\n" +
-                               r"http://www.cleardarksky.com/c/GMUObVAcsk.gif")
+                               "{}".format(imgURL))
             else:
+                sendF3 = File(img, filename='forecast.png')
                 await ctx.send(msg, file=sendF3)
