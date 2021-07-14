@@ -17,8 +17,13 @@ debug = False  # TODO DO NOT COMMIT THIS AS TRUE
 # returns (hasImage, image bytes, imgURL)
 async def getWeatherImage(s: requests.sessions, url: str):
     imgUrl = "Default Image URL"
-    out = None
-    status = False
+    status = True
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:55.0) Gecko/20100101 Firefox/55.0',
+    }
+
+    s.headers = headers
 
     if idSearch := re.search(r"/c/([A-Za-z0-9]+)key.html", url):
         imgUrl = imgUrlTemp.format(idSearch.group(1))
@@ -39,7 +44,7 @@ async def getWeatherImage(s: requests.sessions, url: str):
 
 
 def outputImage(imgBytes: BytesIO, status: bool):
-    if debug and not status:
+    if debug and status:
         f = open("testImage.png", "wb")
         f.write(imgBytes.read())
         f.close()
@@ -48,5 +53,5 @@ def outputImage(imgBytes: BytesIO, status: bool):
 
 if debug:
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(getWeatherImage(requests.session(), "http://www.cleardarksky.com/c/GMUObVAkey.html"))
+    loop.run_until_complete(getWeatherImage(requests.session(), center))
     loop.close()

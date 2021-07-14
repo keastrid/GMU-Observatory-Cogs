@@ -19,6 +19,12 @@ def getSiteData(ses: requests.sessions, url2: str):
     maxTries = 3
     counter = 0
 
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:55.0) Gecko/20100101 Firefox/55.0',
+    }
+
+    ses.headers = headers
+
     # Try a few times if no data was given
     while (page := ses.get(url2)).status_code != 200 and counter < maxTries:
         time.sleep(1)
@@ -73,6 +79,9 @@ def verifyData(data: str):
     if versionFinder := re.search(r'version\s+=\s+"(.+)"', data, re.IGNORECASE):
         version = versionFinder.group(1)
     expectedVersion = 'ah03'  # Version of the data that the parser is keyed for
+
+    print(version)
+    print(data)
 
     if version != expectedVersion and version != "":
         valid = Tribool(None)
@@ -165,4 +174,4 @@ def message(s: requests.sessions):
     return parseSiteData(data)
 
 
-#print(message(requests.Session()))
+print(message(requests.Session()))
